@@ -1,0 +1,90 @@
+:root {
+   --c-sky: #A8E5F5;
+   --c-lgray: #e5e5e5;
+   --c-black: #000;
+   --f-lora: 'Lora', serif;
+}
+
+.title {
+   margin-bottom: 42px;
+   font-size: 40px;
+   text-shadow: 0px 4px 4px #A8E5F5;
+}
+
+input {
+   height: 40px;
+   min-width: 472px;
+   border: 1px solid var(--c-lgray);
+   padding: 7px 10px;
+   font-size: 1em;
+   background: none;
+   border-radius: 3px;
+   font-family: var(--f-lora);
+   outline: none;
+}
+input::placeholder {
+   color: var(--c-black);
+}
+
+button {
+   border: 1px solid var(--c-black);
+   border-radius: 3px;
+   background: none;
+   position: relative;
+   font-family: var(--f-lora);
+   overflow: hidden;
+   font-size: 20px;
+   text-align: center;
+}
+button::after {
+   content: '';
+   display: block;
+   position: absolute;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   height: 8px;
+}
+
+.tube {
+   display: flex;
+   position: relative;
+   background: var(--c-lgray);
+   margin-top: 96px;
+   height: 100px;
+}
+.tube__gradient {
+   position: absolute;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
+   z-index: 2;
+}
+.tube__water {
+   background: var(--c-sky);
+   height: 52px;
+}
+
+#buttonStart {
+   margin-bottom: 15px;
+}
+#buttonStart::after {
+   background: var(--c-sky);
+}
+#buttonExit::after {
+   background: var(--c-lgray);
+}
+button {
+   width: 100%;
+   cursor: pointer;
+}
+.levels {
+   margin-top: 36px;
+   text-align: center;
+   line-height: 20px;
+}
+.levels > * {
+   line-height: 20px;
+}

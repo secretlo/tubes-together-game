@@ -1,0 +1,125 @@
+:root {
+   --c-sky: #A8E5F5;
+   --c-lgray: #e5e5e5;
+   --c-black: #000;
+   --f-lora: 'Lora', serif;
+}
+
+.text-shadow {
+   text-shadow: 0px 4px 4px #A8E5F5;
+   font-size: 30px;
+   margin-left: 10px;
+}
+
+header, footer {
+   height: 71px;
+   font-size: 20px;
+   display: flex;
+   flex-direction: row;
+   justify-content: center;
+   align-items: center;
+}
+
+
+.field {
+   /*width: 650px;*/
+   width: 551px;
+   height: 410px;
+   margin: 24px auto;
+}
+
+.field .row {
+   width: 100%;
+   justify-content: space-between;
+   /*margin-bottom: 10px;*/
+}
+.field .row:last-of-type {
+   margin-bottom: 0;
+}
+
+.field .cell {
+   width: 50px;
+   height: 50px;
+   background: center/cover no-repeat;
+   background-image: url([tube-lr]);
+   transition: border-radius 0.5s ease, transform 0.5s ease;
+}
+
+.field .cell_hover {
+   border-radius: 10px;
+   transform: rotate(-10deg);
+}
+
+.field .cell_begin, .field .cell_end {
+   position: relative;
+}
+.field .cell_begin div, .field .cell_end div {
+   display: block;
+   position: absolute;
+   background: url([arrow]) center no-repeat;
+   width: 50px;
+   height: 50px;
+}
+
+.field .cell_begin:first-child div,
+.field .row:first-child .cell_begin:first-child div,
+.field .row:last-child .cell_begin:first-child div {
+   left: -50px;
+   top: 0;
+   transform: rotate(0deg);
+}
+.field .row:first-child .cell_begin div {
+   top: -50px;
+   left: 0;
+   transform: rotate(90deg);
+}
+.field .row:last-child .cell_begin div {
+   bottom: -50px;
+   left: 0;
+   transform: rotate(-90deg);
+}
+.field .cell_begin:last-child div,
+.field .row:first-child .cell_begin:last-child div,
+.field .row:last-child .cell_begin:last-child div {
+   right: -50px;
+   top: 0;
+   transform: rotate(180deg);
+   left: auto;
+   bottom: auto;
+}
+
+.field .cell_end:first-child div,
+.field .row:first-child .cell_end:first-child div,
+.field .row:last-child .cell_end:first-child div {
+   left: -50px;
+   top: 0;
+   transform: rotate(180deg);
+}
+.field .row:first-child .cell_end div {
+   top: -50px;
+   left: 0;
+   transform: rotate(-90deg);
+}
+.field .row:last-child .cell_end div {
+   bottom: -50px;
+   left: 0;
+   transform: rotate(90deg);
+}
+.field .cell_end:last-child div,
+.field .row:first-child .cell_end:last-child div,
+.field .row:last-child .cell_end:last-child div {
+   right: -50px;
+   top: 0;
+   transform: rotate(0deg);
+   left: auto;
+   bottom: auto;
+}
+
+
+
+#buttonExit {
+   left: 74px;
+   color: var(--c-lgray);
+   font-size: 20px;
+   font-family: var(--f-lora);
+}

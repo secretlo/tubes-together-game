@@ -1,0 +1,18 @@
+[
+   {
+      "host": "127.0.0.1:34717",
+      "id": 1,
+      "isWait": false,
+      "levels": 3,
+      "login": "man",
+      "password": "boy"
+   },
+   {
+      "host": "127.0.0.1:38251",
+      "id": 2,
+      "isWait": false,
+      "levels": 3,
+      "login": "hello",
+      "password": "world"
+   }
+]

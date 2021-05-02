@@ -1,0 +1,78 @@
+* {
+   box-sizing: border-box;
+   line-height: 38px;
+}
+
+
+body {
+   margin: 0;
+   padding: 0;
+   height: 100vh;
+   font-family: 'Lora', serif;
+}
+
+.f-italic {
+   font-style: italic;
+   letter-spacing: 0.2em;
+   line-height: 21px;
+}
+.f-italic > * {
+   line-height: 21px;
+}
+
+
+.row {
+   display: flex;
+}
+.col {
+   display: flex;
+   flex-direction: column;
+}
+
+.aic {
+   align-items: center;
+}
+.jcc {
+   justify-content: center;
+}
+.jcsb {
+   justify-content: space-between;
+}
+
+.wrap {
+   flex-wrap: wrap;
+}
+
+.dn {
+   display: none;
+}
+
+.abs {
+   position: absolute;
+}
+.rel {
+   position: relative;
+}
+
+.w100 {
+   width: 100%;
+}
+.h100 {
+   height: 100%;
+}
+.wfc {
+   width: fit-content;
+}
+.hfc {
+   height: fit-content;
+}
+.w50 {
+   width: 50%;
+}
+.h50 {
+   height: 50%;
+}
+
+.cup {
+   cursor: pointer;
+}
