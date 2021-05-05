@@ -94,4 +94,6 @@ class LifespanHandler(object):
     def OnBeforeClose(self, browser):
         print(f'Broswer ID: {browser.GetIdentifier()}')
         print('Browser will close and will exit')
-        storage.connection_process.terminate()
+        storage.swap_manager.shutdown()
+        if storage.connection_process:
+            storage.connection_process.terminate()

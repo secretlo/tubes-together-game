@@ -1,4 +1,5 @@
 import storage
+import time
 
 def send_login(login, password, callback):
    res = storage.load('/login', {
@@ -44,8 +45,14 @@ def start_server(callback):
       'host': storage.server_url,
       'level': storage.level,
    })
+   if res['status'] == 'Connected':
+      print(storage)
+      storage.swap['session_id'] = res['session_id']
+      storage.swap['field'] = res['field']
+      storage.swap['players'] = res['players']
+      
    callback.Call(res)
-   
+
 def stop_server():
    storage.gameload('unwait', {})
    storage.stop_server()

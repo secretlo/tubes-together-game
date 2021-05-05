@@ -1,34 +1,60 @@
 $('.cell')
    .hover(
       e => {
-         e.target.classList.add('cell_hover');
+         sendHover(e.target.dataset.x, e.target.dataset.y);
       },
       e => {
-         e.target.classList.remove('cell_hover');
+         sendUnhover(e.target.dataset.x, e.target.dataset.y);
       }
    )
    .click(e => {
-      rotateCell(e.target);
+      if (!isMyOrder()) {
+         alert('Сейчас не ваша очередь! Подождите пока походит партнер ;)');
+         return;
+      }
+
+      const cell = e.target,
+         x = cell.dataset.x,
+         y = cell.dataset.y;
+      
+      sendRotate(x, y);
    })
 
+function isMyOrder() {
+   return !orderMe.classList.contains('dn');
+}
+
+function forceHover(x, y, host) {
+   const cell = getCell(x, y);
+   
+   cell.wasForceHover = true;
+   cell.classList.add('cell_hover');
+}
+function forceUnhover(x, y, host) {
+   const cell = getCell(x, y);
+
+   cell.wasForceHover = false;
+   cell.classList.remove('cell_hover');
+}
 
 Math.randint = (min, max) => (Math.floor(Math.random() * max) + min);
 
-const CELL_TYPES = ['lr', 'tb', 'lrb', 'lrt', 'rtb', 'ltb', 'lrtb'];
-document.querySelectorAll('.field .row').forEach((row, i) => {
-   row.querySelectorAll('.cell').forEach((cell, j) => {
-      setTube(cell, CELL_TYPES[Math.randint(0, 7)]);
-      cell.dataset.x = j;
-      cell.dataset.y = i;
+function buildField(field) {
+   document.querySelectorAll('.field .row').forEach((row, y) => {
+      row.querySelectorAll('.cell').forEach((cell, x) => {
+         setTube(cell, field[y][x]);
+         cell.dataset.x = x;
+         cell.dataset.y = y;
+      });
    });
-});
+}
+
 function setTube(cell, type) {
    cell.dataset.type = type;
    cell.style.backgroundImage = `url('${window[`image_tube_${type}`].src}')`;
 }
 
 $('.cell_begin').add($('.cell_end')).append($("<div></div>"));
-
 
 async function rotateCell(cell) {
    if (cell.hasAttribute('is-water')) return;
@@ -50,8 +76,36 @@ async function rotateCell(cell) {
       newType = 'rtb';
    else if (cellType == 'rtb')
       newType = 'lrb';
+   
+   const startScale = cell.classList.contains('cell_hover') ? '1.2' : '1.0';
+   const startBrad = cell.classList.contains('cell_hover') ? '10px' : '0px';
 
-   const animation = cell.animate([{transform: 'rotate(0deg)'}, {transform: 'rotate(90deg)'}], {easing: 'ease', duration: 500});
+   const animation = cell.animate([
+      {
+         transform: `rotate(0deg) scale(${startScale})`, 
+         borderRadius: startBrad,
+         zIndex: 2, 
+         offset: 0.00
+      }, 
+      {
+         transform: `rotate(0deg) scale(1.5)`,
+         borderRadius: '10px',
+         zIndex: 2,
+         offset: 0.10
+      }, 
+      {
+         transform: `rotate(90deg) scale(1.5)`, 
+         borderRadius: '10px',
+         zIndex: 2, 
+         offset: 0.90
+      },
+      {
+         transform: `rotate(90deg) scale(${startScale})`, 
+         borderRadius: startBrad,
+         zIndex: 2, 
+         offset: 1.00
+      },
+   ], {easing: 'ease', duration: 500});
 
    animation.onfinish = () => {
       cell.dataset.type = newType;
@@ -59,17 +113,66 @@ async function rotateCell(cell) {
    };
 }
 
-$('footer').click(e => {
-   $('.cell').each((i, cell) => {
-      cell.style.backgroundImage = `url('${window[`image_tube_${cell.dataset.type}`].src}')`;
-      cell.removeAttribute('is-water');
-   });
-});
-$('header').click(e => startWater());
+function makeStepXY(x, y) {
+   const cell = getCell(x, y);
+   makeStep(cell);
+}
+function makeStep(cell) {
+   rotateCell(cell);
+   
+   if (orderMe.classList.contains('dn')) { // was partner turn
+      orderMe.classList.remove('dn');
+      orderPartner.classList.add('dn');
+   } else { // was my turn
+      orderMe.classList.add('dn');
+      orderPartner.classList.remove('dn');
+   }
+}
+
+function getCell(x, y) {
+   return $(`.cell[data-x="${x}"][data-y="${y}"]`)[0];  
+}
+
+//$('footer').click(e => {
+//   $('.cell').each((i, cell) => {
+//      cell.style.backgroundImage = `url('${window[`image_tube_${cell.dataset.type}`].src}')`;
+//      cell.removeAttribute('is-water');
+//   });
+//});
+//$('header').click(e => startWater());
+
+function onWaterFinished() {
+   if (!wasWin) // lose
+      alert('Вы проиграли..');
+   alert('Течение воды завершилось, вы будете перенаправлены на главный экран');
+   loadPage('main-menu');
+}
+
+let wasWaterStart = false;
 async function startWater() {
+   if (wasWaterStart) return;
+   wasWaterStart = true;
+
    const cellBegin = $('.cell_begin')[0];
+
+   // check water start is OK
+   const x = cellBegin.dataset.x, y = cellBegin.dataset.y,
+      type = cellBegin.dataset.type;
+   if (x == 0 || x == 11-1) { // left or right edge
+      if (!type.includes(x == 0 ? 'l' : 'r')) {
+         onWaterFinished();
+         return;
+      }
+   }
+   else { // top or bottom edge
+      if (!type.includes(y == 0 ? 't' : 'b')) {
+         onWaterFinished();
+         return;
+      }
+   }
+
    await sendWater(cellBegin, null, null);
-   alert('Finished');
+   onWaterFinished();
 }
 async function sendWater(cell, senderX, senderY) {
    if (cell.hasAttribute('is-water'))
@@ -128,7 +231,7 @@ async function sendWater(cell, senderX, senderY) {
    
    const promises = [];
    for (const direction of directions) {
-      const cell = $(`.cell[data-x="${direction.x}"][data-y="${direction.y}"]`)[0];
+      const cell = getCell(direction.x, direction.y);
       promises.push(sendWater(cell, x, y));
    }
 
@@ -142,11 +245,52 @@ async function fillWater(cell) {
    cell.setAttribute('is-water', '');
 }
 
-
+let wasWin = false;
 function win() {
-   alert('WIN!!!');
+   if (wasWin) return;
+   
+   alert('Вы выиграли!!');
+   wasWin = true;
 }
 
+
+let HOST;
+getUserHost(host => {
+   HOST = host;
+});
+getGameData(gameData => {
+   const { session_id, players, field } = gameData;
+   buildField(field);
+
+   if (players[0].host == HOST) {
+      orderMe.classList.remove('dn');
+      orderPartner.classList.add('dn');
+   } else {
+      orderMe.classList.add('dn');
+      orderPartner.classList.remove('dn');
+   }
+});
+
+let secondsLeft = 10;
+setTimeLeft(secondsLeft);
+const clockInterval = setInterval(() => {
+   setTimeLeft(secondsLeft--);
+   if (secondsLeft == -1) {
+      clearInterval(clockInterval);
+      sendStartWater();
+   }
+}, 1000);
+
+function setTimeLeft(incomingSeconds) {
+   const date = new Date(0, 0, 0, 0, 0, incomingSeconds, 0);
+   let minutes = date.getMinutes().toString(),
+      seconds = date.getSeconds().toString();
+   
+   minutes = '0'.repeat(2 - minutes.length) + minutes;
+   seconds = '0'.repeat(2 - seconds.length) + seconds;
+
+   timeLeft.textContent = minutes + ':' + seconds;
+}
 
 setInterval(() => {
    getTasks(tasks => {

@@ -1,6 +1,6 @@
 [
    {
-      "host": "127.0.0.1:34717",
+      "host": "127.0.0.1:44319",
       "id": 1,
       "isWait": false,
       "levels": 3,
@@ -8,7 +8,7 @@
       "password": "boy"
    },
    {
-      "host": "127.0.0.1:38251",
+      "host": "127.0.0.1:60547",
       "id": 2,
       "isWait": false,
       "levels": 3,

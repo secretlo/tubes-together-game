@@ -16,6 +16,7 @@ namespace RouteGame {
 
    int randint(int min, int max);
    void sendAll(json& game, std::string action, json data);
+   json generateField();
 
    size_t getReadyCount(json& game);
    size_t getConnectionCount(json& game);

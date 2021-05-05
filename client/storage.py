@@ -5,6 +5,7 @@ import json
 import multiprocessing
 from flask import Flask, request
 import socket
+import ctypes
 
 # this is pointer to the module object itself
 this = sys.modules[__name__]
@@ -12,7 +13,6 @@ this = sys.modules[__name__]
 # setting props
 this.browser = None
 this.id = None
-this.session_id = None
 this.level = None
 this.connection_count = None
 
@@ -22,6 +22,10 @@ this.flask = Flask(__name__)
 this.port = None
 this.host = None
 this.server_url = None
+
+this.swap_manager = multiprocessing.Manager()
+this.swap = this.swap_manager.dict()
+this.swap['session_id'] = None
 
 this.tasks = multiprocessing.Queue(20)
 def add_task(js_func_name, *args):
@@ -53,7 +57,7 @@ def gameload(action, data):
    final_data = {
       'action': action,
       'id': this.id,
-      'session_id': this.session_id,
+      'session_id': this.swap['session_id'],
    }
 
    for [key, val] in data.items():
@@ -84,6 +88,7 @@ def _on_response():
 def add_response_handler(action, callback):
    print(f'add_repsonse_handler: addign "{action}" with callback', callback)
    response_handlers.append([action, callback])
+   
 
 def run_server():
    this.host = FLASK_HOST

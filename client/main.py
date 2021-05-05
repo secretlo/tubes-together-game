@@ -8,8 +8,6 @@ import storage
 import builtins
 
 from logic.login import *
-from logic.create_game import *
-from logic.connect_game import *
 from logic.game import *
 
 
@@ -25,8 +23,6 @@ def main():
         'function': {
             'sendLogin': send_login,
             'sendRegister': send_register,
-            'createGame': create_game,
-            'connectGame': connect_game,
             'getLevels': get_levels,
             
             'startServer': start_server,
@@ -36,6 +32,7 @@ def main():
             
             'getGameId': get_session_id,
             'getUserHost': get_user_host,
+            'getGameData': get_game_data,
             'getConnectionCount': get_connection_count,
             'getReadyCount': get_ready_count,
             'getTasks': get_tasks,
@@ -43,9 +40,10 @@ def main():
             'sendReady': send_ready,
             'sendUnready': send_unready,
             'sendDisconnect': send_disconnect,
-            'sendPositionUpdate': send_position_update,
-            'sendEnemyRequest': send_enemy_request,
-            'sendDie': send_die,
+            'sendRotate': send_rotate,
+            'sendHover': send_hover,
+            'sendUnhover': send_unhover,
+            'sendStartWater': send_start_water,
         }
     }) # Loading browser on 'index' page
     # [data] NO CODE SHOULD BE HERE, BROWSER BLOCK CODE EXECUTION

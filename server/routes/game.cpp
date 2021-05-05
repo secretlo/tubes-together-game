@@ -17,6 +17,20 @@ namespace RouteGame {
       }
    }
    
+   json generateField() {
+      json cells = json::array({ "lr", "tb", "lrt", "lrb", "ltb", "rtb", "lrtb" });
+      json field = json::array();
+
+      for (int y = 0; y < 7; y++) {
+         field.push_back(json::array());
+         for (int x = 0; x < 11; x++) {
+            field[y][x] = cells[randint(0, 6)].get<std::string>();
+         }
+      }
+      
+      return field;
+   }
+   
 
    void PostHandler(const Request& req, Response& res) {
       std::cout << "Game: Post\n";
@@ -53,43 +67,51 @@ namespace RouteGame {
                user->at("isWait") = false;
 
                json defaultGame = File::ReadJson(pwd + "/../data/default-game.json"),
-                  defaultGameUser = File::ReadJson(pwd + "/../data/default-game-user.json");
+                  defaultGameUser;
                
-               size_t gameID;
+               size_t sessionID;
                
                games->updateJson([&](json* games){
+                  defaultGameUser = File::ReadJson(pwd + "/../data/default-game-user.json");
                   defaultGameUser["id"] = user->at("id").get<size_t>();
                   defaultGameUser["host"] = user->at("host").get<std::string>();
                   defaultGame["users"].push_back(defaultGameUser);
 
+                  defaultGameUser = File::ReadJson(pwd + "/../data/default-game-user.json");
                   defaultGameUser["id"] = partner->at("id").get<size_t>();
                   defaultGameUser["host"] = partner->at("host").get<std::string>();
                   defaultGame["users"].push_back(defaultGameUser);
                   
                   size_t maxID = 0;
                   jsonForEach(games, [&](json& game){
-                     size_t gameID = game["id"].get<size_t>();
-                     if (maxID < gameID) maxID = gameID;
+                     size_t sessionID = game["id"].get<size_t>();
+                     if (maxID < sessionID) maxID = sessionID;
                   });
-                  gameID = maxID + 1;
-                  defaultGame["id"] = gameID;
+                  sessionID = maxID + 1;
+                  defaultGame["id"] = sessionID;
                   
                   games->push_back(defaultGame);
-
-                  jsonForSome(games, "id", gameID, [&](json& game){
-                     sendAll(game, "start", json{
-                        {"seesion_id", gameID},
+                  jsonForSome(games, "id", sessionID, [&](json& game){
+                     json field = generateField();
+                     
+                     response(res, "Connected", action, json{
+                        {"session_id", sessionID},
                         {"players", game["users"]},
+                        {"field", field},
                      });
-                     response(res, "Connected", action);
+                     sendAll(game, "start", json{
+                        {"session_id", sessionID},
+                        {"players", game["users"]},
+                        {"field", field},
+                     });
                   });
                });
             } // if partner
             else { // else if NO partner
                user->at("isWait") = true;
                user->at("host") = host;
-               //response(res, "Wait", action);
-               response(res, "Connected", action);
+               response(res, "Wait", action);
+               //response(res, "Connected", action);
             }
          }); // users->updateJson end
       }
@@ -106,6 +128,38 @@ namespace RouteGame {
          size_t sessionID = std::stoi(getParam(req, "session_id"));
 
          std::cout << "Game: Action '" << action << "' from user (id: " << id << ", sessionID: " << sessionID << ")\n";
+         File* games = new File(pwd + "/../data/games.json");
+
+         games->updateJson([&](json* games){
+            jsonForSome(games, "id", sessionID, [&](json& game){
+               
+               // Action: Rotate
+               if (
+                  action == "rotate" ||
+                  action == "hover" ||
+                  action == "unhover"
+               ) {
+                  size_t x = std::stoi(getParam(req, "x")), 
+                         y = std::stoi(getParam(req, "y"));
+                  std::string senderID = getParam(req, "sender");
+                         
+                  std::cout << "Game, " << action << ": x is " << x << ", y is " << y << std::endl;
+                  
+                  response(res, "OK", action);
+                  sendAll(game, action, json{
+                     {"x", x},
+                     {"y", y},
+                     {"sender", senderID},
+                  });
+               }
+               
+               else if (action == "start-water") {
+                  response(res, "OK", action);
+                  sendAll(game, action, json{});
+               }
+
+            }); // game var end
+         }); // games->updateJson end (games var end)
       }
 
    }
