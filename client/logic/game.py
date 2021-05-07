@@ -5,7 +5,7 @@ from flask import request
 import threading
 
 
-def handle():
+def init_game_handlers():
    storage.add_response_handler('connect', on_game_connect)
    
    storage.add_response_handler('connection-count-update', on_connection_count_update)
@@ -126,6 +126,6 @@ def get_tasks(callback):
    else:
       pass
       #print('getTasks: queue is empty ', get_task_counter)
-   
 
-handle()
+
+init_game_handlers()

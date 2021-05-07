@@ -5,7 +5,6 @@ import json
 import multiprocessing
 from flask import Flask, request
 import socket
-import ctypes
 
 # this is pointer to the module object itself
 this = sys.modules[__name__]
@@ -23,9 +22,12 @@ this.port = None
 this.host = None
 this.server_url = None
 
-this.swap_manager = multiprocessing.Manager()
-this.swap = this.swap_manager.dict()
-this.swap['session_id'] = None
+def init_swap():
+   global this
+   print('INIT SWAP:', this.init_swap)
+   this.swap_manager = multiprocessing.Manager()
+   this.swap = this.swap_manager.dict()
+   this.swap['session_id'] = None
 
 this.tasks = multiprocessing.Queue(20)
 def add_task(js_func_name, *args):
@@ -82,7 +84,7 @@ def _on_response():
          
    if response == None:
       print(f'_on_response: Error, no handler returned response for query with action "{action}"')
-      raise ConnectionAbortedError()
+      return ''
    return response
 
 def add_response_handler(action, callback):
@@ -93,7 +95,8 @@ def add_response_handler(action, callback):
 def run_server():
    this.host = FLASK_HOST
    this.port = _get_free_port()
-   process = multiprocessing.Process(target=_connect_stuff, args=(this.host, this.port, this.tasks))
+   this.init_swap()
+   process = multiprocessing.Process(target=_connect_stuff, args=(this.host, this.port, this.tasks, this.swap))
    this.connection_process = process
    process.start()
    this.server_url = f'{this.host}:{this.port}'
@@ -101,8 +104,9 @@ def run_server():
 def stop_server():
    this.connection_process.terminate()
    
-def _connect_stuff(host, port, tasks):
+def _connect_stuff(host, port, tasks, swap):
    this.tasks = tasks
+   this.swap = swap
    this.flask.run(host, port)
    
 def _get_free_port():

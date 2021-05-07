@@ -22,10 +22,10 @@ namespace RouteCreateGame {
    void PostHandler(const Request& req, Response& res) {
       std::cout << "Create Game: Post\n";
 
-      auto gamesFile = new File("..\\data\\games.json");
+      auto gamesFile = new File("../data/games.json");
 
       json games = gamesFile->readJson();
-      json gameTpl = File::ReadJson("..\\data\\default-game.json");
+      json gameTpl = File::ReadJson("../data/default-game.json");
       
       int gameId = getMinId(games);
       

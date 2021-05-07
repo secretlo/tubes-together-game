@@ -506,9 +506,9 @@ function getCell(x, y) {
 //$('header').click(e => startWater());
 
 function onWaterFinished() {
-   if (!wasWin) { // lose
+   if (!wasWin) // lose
       alert('Вы проиграли..');
-   }
+   alert('Течение воды завершилось, вы будете перенаправлены на главный экран');
    loadPage('main-menu');
 }
 

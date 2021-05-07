@@ -80,7 +80,7 @@ json File::readJson() {
    try {
       return json::parse(read());
    } catch (...) {
-      std::cout << "Error in File::readJson: Failed to read or json::parse data\n";
+      std::cout << "Error in File::readJson: Failed to read or json::parse data (" << this->abspath << ")\n";
    }
 }
 void File::writeJson(json data) {
